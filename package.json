@@ -5,7 +5,8 @@
   "description": "This GitHub repository serves as the foundation of the cloud computing microservice project. It includes initial setup of development environment, GitHub repositories, API server using Node.js and Express, structured logging, HTTP testing tools, npm scripts, and VSCode debugging configurations.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --config .eslintrc.js \"./src/**/*.js\"" 
   },
   "repository": {
     "type": "git",
@@ -15,6 +16,11 @@
   "author": "Ben Akram",
   "license": "UNLICENSED",
   "devDependencies": {
+    "eslint": "^8.49.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-n": "^16.0.2",
+    "eslint-plugin-promise": "^6.1.1",
     "prettier": "3.0.3"
   }
 }
