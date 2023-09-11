@@ -20,7 +20,7 @@ Before you begin ensure you have the following installed:
 1. Clone this repository to your local machine:
 
    ```powershell
-   git clone https://github.com/yourusername/your-project.git
+   git clone https://github.com/benakram4/fragments.git
    cd your-project
    ```
 
