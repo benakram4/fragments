@@ -64,7 +64,7 @@ To start the server in production mode, use:
 npm start
 ```
 
-The server will run at http://localhost:8080.
+The server will run at <http://localhost:8080>.
 
 ### Development Mode
 
@@ -84,8 +84,8 @@ npm run debug
 
 For detailed instructions on how to use the VSCode debugger, including setting breakpoints, and inspecting variables see:
 
-- https://code.visualstudio.com/docs/editor/debugging
-- https://code.visualstudio.com/docs/nodejs/nodejs-debugging
+- <https://code.visualstudio.com/docs/editor/debugging>
+- <https://code.visualstudio.com/docs/nodejs/nodejs-debugging>
 
 ## Additional Information
 
@@ -95,7 +95,7 @@ I was facing some issues with installing [jq](https://stedolan.github.io/jq/) on
 
 The jq documentation provides two installation methods:
 
-- #### Using Winget:
+- #### Using Winget
 
   You can install jq using the Winget package manager with this command:
 
@@ -103,7 +103,7 @@ The jq documentation provides two installation methods:
   winget install jqlang.jq.
   ```
 
-- #### Downloading the Executable:
+- #### Downloading the Executable
 
   you can download the jq executable directly, but this method requires manual addition of jq's PATH to the Windows environment variables.
 
@@ -156,9 +156,8 @@ To help any one who encounters with a problem like this for the first time i mad
    - Open a new command prompt or PowerShell window.
    - Type `jq --version` and press Enter. You should see the version information for 'jq' if the installation and PATH configuration were successful.
 
-## Screenshots
-
 ## Acknowledgments
 
-- [Cloud-computing-for-programmers-fall-2023 Lab01 ](https://github.com/humphd/cloud-computing-for-programmers-fall-2023/blob/main/labs/lab-01/README.md)
+- [Cloud-computing-for-programmers-fall-2023 Lab01](https://github.com/humphd/cloud-computing-for-programmers-fall-2023/blob/main/labs/lab-01/README.md)
 - [ChatGpt](https://chat.openai.com/)
+- [README Template](https://gist.github.com/DomPizzie/7a5ff55ffa9081f2de27c315f5018afc)
