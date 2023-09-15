@@ -12,9 +12,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 
-// author and version from our package.json file
-const { author, version, repository } = require('../package.json');
-
 // import logger
 const logger = require('./logger');
 const pino = require('pino-http')({
@@ -37,21 +34,8 @@ app.use(cors());
 // Use gzip/deflate compression middleware
 app.use(compression());
 
-// create a GET route for the root path, if server is running correctly,
-// it will return a 200 status code, else it will return a 500 status code
-app.get('/', (req, res) => {
-  // Clients shouldn't cache this response (always request it fresh)
-  // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching#controlling_caching
-  res.setHeader('Cache-Control', 'no-cache');
-
-  // send 200 'OK' response with info about the repo
-  res.status(200).json({
-    status: 'ok',
-    author,
-    githubUrl: repository.url,
-    version,
-  });
-});
+// Define our routes
+app.use('/', require('./routes'));
 
 // Add 404 middleware to handle any requests for resources that can't be found
 app.use((req, res) => {
