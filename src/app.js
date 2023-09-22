@@ -12,6 +12,10 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 
+
+// Import the functions that we'll use to create our error responses
+const { createErrorResponse } = require('./response');
+
 // import logger
 const logger = require('./logger');
 const pino = require('pino-http')({
@@ -47,13 +51,7 @@ app.use('/', require('./routes'));
 
 // Add 404 middleware to handle any requests for resources that can't be found
 app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    error: {
-      message: 'not found',
-      code: 404,
-    },
-  });
+  res.status(404).json(createErrorResponse(404, 'not found'));
 });
 
 // Add error-handling middleware to deal with anything else
@@ -69,13 +67,16 @@ app.use((err, req, res, next) => {
     logger.error({ err }, `Error processing request`);
   }
 
-  res.status(status).json({
-    status: 'error',
-    error: {
-      message,
-      code: status,
-    },
-  });
+  res.status(status).json(createErrorResponse(status, message));
+
+  // this was replaced by the above code to use our response.js functions
+  // res.status(status).json({
+  //   status: 'error',
+  //   error: {
+  //     message,
+  //     code: status,
+  //   },
+  // });
 });
 
 // Export our `app` so we can access it in server.js
