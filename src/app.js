@@ -12,7 +12,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 
-
 // Import the functions that we'll use to create our error responses
 const { createErrorResponse } = require('./response');
 
