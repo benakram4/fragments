@@ -23,6 +23,8 @@ describe('POST /fragments', () => {
       .auth(username, password)
       .set('Content-Type', 'text/plain')
       .send('test fragment');
+
+    // Log the response
     logger.debug({
       status: res.statusCode,
       headers: res.headers,

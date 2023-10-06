@@ -6,7 +6,6 @@ const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
 const { createErrorResponse, createSuccessResponse } = require('../../response');
 
-
 const router = express.Router();
 
 router.post('/fragments', async (req, res, next) => {
@@ -18,18 +17,22 @@ router.post('/fragments', async (req, res, next) => {
     const { type } = contentType.parse(req);
     // check if the type is supported
     if (!Fragment.isSupportedType(type)) {
-      logger.debug(`415 type is not supported`);
+      logger.warn(`415 type is not supported`);
       res.status(415).json(createErrorResponse(415, 'Unsupported Media Type'));
     }
     logger.debug(`type: ${type}`);
 
     // get the body from the request
     const data = req.body;
-    // check if data is defined
     logger.debug(`req.body: ${data}`);
 
     // get user email from auth header
     const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      logger.warn('401 Unauthorized');
+      res.status(401).json(createErrorResponse(401, 'Unauthorized'));
+      return;
+    }
     logger.debug(`authHeader: ${authHeader}`);
     const encodedCredentials = authHeader.split(' ')[1];
     logger.debug(`encodedCredentials: ${encodedCredentials}`);
@@ -38,7 +41,6 @@ router.post('/fragments', async (req, res, next) => {
     const email = decodedCredentials.split(':')[0];
     logger.debug(`email: ${email}`);
 
-
     if (Buffer.isBuffer(data)) {
       // create a new fragment
       const fragment = new Fragment({
@@ -46,27 +48,33 @@ router.post('/fragments', async (req, res, next) => {
         type: type,
       });
 
-      logger.debug(`fragment ownerId: ${fragment.ownerId}`);
+      logger.debug(`fragment ownerId: ${fragment.ownerId}, saving fragment...`);
       await fragment.save();
       await fragment.setData(data);
       logger.debug(`fragment saved`);
 
       // send the response
-      res.status(201).json(createSuccessResponse({
-        fragment: {
-          id: fragment.id,
-          ownerId: fragment.ownerId,
-          size: fragment.size,
-          type: fragment.type,
-          created: fragment.created,
-          updated: fragment.updated,
-          links: {
-            self: `${API_URL}/v1/fragments/${fragment.id}`,
+      const location = `${API_URL}/v1/fragments/${fragment.id}`;
+      logger.debug(`location: ${location}`);
+      res.setHeader('Location', location);
+
+      res.status(201).json(
+        createSuccessResponse({
+          fragment: {
+            id: fragment.id,
+            ownerId: fragment.ownerId,
+            size: fragment.size,
+            type: fragment.type,
+            created: fragment.created,
+            updated: fragment.updated,
+            links: {
+              self: location,
+            },
           },
-        },
-      }));
+        })
+      );
     } else {
-      logger.debug(`400 req.body is not a Buffer`);
+      logger.warn(`400 req.body is not a Buffer`);
       res.status(400).json(createErrorResponse(400, 'invalid request, missing data'));
     }
   } catch (err) {
