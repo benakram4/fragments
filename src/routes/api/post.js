@@ -28,11 +28,7 @@ router.post('/fragments', async (req, res, next) => {
 
     // get user email from auth header
     const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      logger.warn('401 Unauthorized');
-      res.status(401).json(createErrorResponse(401, 'Unauthorized'));
-      return;
-    }
+
     logger.debug(`authHeader: ${authHeader}`);
     const encodedCredentials = authHeader.split(' ')[1];
     logger.debug(`encodedCredentials: ${encodedCredentials}`);
@@ -44,19 +40,20 @@ router.post('/fragments', async (req, res, next) => {
     if (Buffer.isBuffer(data)) {
       // create a new fragment
       const fragment = new Fragment({
-        ownerId: email,
+        ownerId: req.user,
         type: type,
       });
 
       logger.debug(`fragment ownerId: ${fragment.ownerId}, saving fragment...`);
       await fragment.save();
       await fragment.setData(data);
+      logger.debug(`fragment size: ${fragment.size}`);
       logger.debug(`fragment saved`);
 
       // send the response
       const location = `${API_URL}/v1/fragments/${fragment.id}`;
       logger.debug(`location: ${location}`);
-      res.setHeader('Location', location);
+      res.location(location);
 
       res.status(201).json(
         createSuccessResponse({
@@ -67,9 +64,6 @@ router.post('/fragments', async (req, res, next) => {
             type: fragment.type,
             created: fragment.created,
             updated: fragment.updated,
-            links: {
-              self: location,
-            },
           },
         })
       );

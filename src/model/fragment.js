@@ -19,6 +19,7 @@ const {
   listFragments,
   deleteFragment,
 } = require('./data');
+const logger = require('../logger');
 
 class Fragment {
   constructor({
@@ -63,7 +64,9 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
+    logger.debug(`byUser ownerId: ${ownerId}`);
     const fragments = await listFragments(ownerId, expand);
+    logger.debug(`byUser fragments: ${fragments}`);
     return fragments;
   }
 

@@ -1,3 +1,5 @@
+const logger = require("../../../logger");
+
 const validateKey = (key) => typeof key === 'string';
 
 class MemoryDB {
@@ -59,6 +61,7 @@ class MemoryDB {
     // No matter what, we always return an array (even if empty)
     const db = this.db;
     const values = db[primaryKey] ? Object.values(db[primaryKey]) : [];
+    logger.debug(`query values: ${values}`);
     return Promise.resolve(values);
   }
 

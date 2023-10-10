@@ -2,7 +2,6 @@
 
 const request = require('supertest');
 const app = require('../../src/app');
-// const { Fragment } = require('../../src/model/fragment');
 const logger = require('../../src/logger');
 const { createErrorResponse, createSuccessResponse } = require('../../src/response');
 
@@ -25,11 +24,11 @@ describe('POST /fragments', () => {
       .send('test fragment');
 
     // Log the response
-    logger.debug({
-      status: res.statusCode,
-      headers: res.headers,
-      body: res.body,
-    });
+    logger.info('POST /v1/fragments response');
+    logger.info(`status: ${res.statusCode}`);
+    logger.info(`headers: ${JSON.stringify(res.headers, null, 2)}`);
+    logger.info(`body: ${JSON.stringify(res.body, null, 2)}`);
+
     const retResponse = createSuccessResponse({
       fragment: {
         id: res.body.fragment.id,
@@ -38,21 +37,20 @@ describe('POST /fragments', () => {
         type: res.body.fragment.type,
         created: res.body.fragment.created,
         updated: res.body.fragment.updated,
+        // data: res.body.fragment.data, // ? Buffer.from(data) or do we even need this?
         links: res.body.fragment.links,
       },
     });
     expect(res.statusCode).toBe(201);
+    // check the content-location header
+    expect(res.headers['location']).toEqual(
+      expect.stringContaining(`/v1/fragments/${res.body.fragment.id}`)
+    );
+    // check the content-type header
+    expect(res.body.fragment.type).toEqual(expect.stringContaining('text/plain'));
+
     // This checks all all of the properties of the response body
     expect(res.body).toEqual(retResponse);
-    // bellow is just an example of how to check a single property
-    // expect(res.body.status).toBe('ok');
-    // expect(res.body.fragment.id).toBeDefined();
-    // expect(res.body.fragment.ownerId).toBe(username);
-    // expect(res.body.fragment.type).toBe('text/plain');
-    // expect(res.body.fragment.size).toEqual(Buffer.byteLength('test fragment'));
-    // expect(res.body.fragment.created).toBeDefined();
-    // expect(res.body.fragment.updated).toBeDefined();
-    // expect(res.body.fragment.links.self).toEqual(expect.stringContaining(`/v1/fragments/${res.body.fragment.id}`));
   });
 
   test('unsupported media type returns 415', async () => {
