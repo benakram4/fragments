@@ -9,5 +9,10 @@
   },
   "files.eol": "\n",
   "files.insertFinalNewline": true,
-  "cSpell.words": ["pino"]
+  "cSpell.words": [
+    "pino"
+  ],
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  }
 }
