@@ -9,9 +9,10 @@ const { createErrorResponse, createSuccessResponse } = require('../../response')
 const router = express.Router();
 
 router.post('/fragments', async (req, res, next) => {
-  const API_URL = process.env.API_URL || `http://${req.headers.host}`;
+  const API_URL = `http://${req.headers.host}`;
   try {
     logger.info(`API_URL: ${API_URL}`);
+    console.log(`API_URL: ${API_URL}`);
 
     // get the type from the request
     const { type } = contentType.parse(req);

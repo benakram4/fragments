@@ -31,12 +31,7 @@ describe('GET /v1/fragments', () => {
       await fragment2.save();
       await fragment2.setData(Buffer.from('test fragment 2'));
 
-      // // get the data of each fragment
-      // fragment1.data = await fragment1.getData();
-      // fragment2.data = await fragment2.getData();
-      // logger.debug(`fragment1.data: ${fragment1.data}`);
-      // logger.debug(`fragment2.data: ${fragment2.data}`);
-
+      // make the request
       const res = await request(app)
         .get('/v1/fragments?expand=1')
         .auth('user1@email.com', 'password1');
@@ -124,5 +119,4 @@ describe('GET /v1/fragments', () => {
       );
     });
   });
-  // TODO: we'll need to add tests to check the contents of the fragments array later
 });
