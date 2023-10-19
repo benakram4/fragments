@@ -1,6 +1,7 @@
 // tests/unit/get.test.js
 
 const request = require('supertest');
+const hash = require('../../src/hash');
 const app = require('../../src/app');
 const { Fragment } = require('../../src/model/fragment');
 const { createSuccessResponse } = require('../../src/response');
@@ -24,17 +25,19 @@ describe('GET /v1/fragments', () => {
     // Using a valid username/password pair should give a success result with a .fragments array
     test('authenticated users get a fragments array with expand flag', async () => {
       // create 2 fragments for the user
-      const fragment1 = new Fragment({ ownerId: 'user1@email.com', type: 'text/plain' });
+      const email = 'user1@email.com'
+      const hashEmail = hash(email)
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment1.save();
       await fragment1.setData(Buffer.from('test fragment 1'));
-      const fragment2 = new Fragment({ ownerId: 'user1@email.com', type: 'text/plain' });
+      const fragment2 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment2.save();
       await fragment2.setData(Buffer.from('test fragment 2'));
 
       // make the request
       const res = await request(app)
         .get('/v1/fragments?expand=1')
-        .auth('user1@email.com', 'password1');
+        .auth(email, 'password1');
 
       // get the host header: res.req.getHeader('host')
       const host = res.req.getHeader('host');
@@ -62,10 +65,12 @@ describe('GET /v1/fragments', () => {
 
     test("authenticated users get a fragments array pf id's", async () => {
       // create 2 fragments for the user
-      const fragment1 = new Fragment({ ownerId: 'user2@email.com', type: 'text/plain' });
+      const email = 'user2@email.com'
+      const hashEmail = hash(email)
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment1.save();
       await fragment1.setData(Buffer.from('test fragment 1'));
-      const fragment2 = new Fragment({ ownerId: 'user2@email.com', type: 'text/plain' });
+      const fragment2 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment2.save();
       await fragment2.setData(Buffer.from('test fragment 2'));
 
@@ -74,7 +79,7 @@ describe('GET /v1/fragments', () => {
       fragments.push(fragment1.id);
       fragments.push(fragment2.id);
 
-      const res = await request(app).get('/v1/fragments').auth('user2@email.com', 'password2');
+      const res = await request(app).get('/v1/fragments').auth(email, 'password2');
 
       // check the response status code
       expect(res.statusCode).toBe(200);
@@ -95,7 +100,9 @@ describe('GET /v1/fragments', () => {
   describe('GET Fragment by id', () => {
     test("Gets an authenticated user's fragment data with the given id", async () => {
       // create a fragment for the user
-      const fragment1 = new Fragment({ ownerId: 'user2@email.com', type: 'text/plain' });
+      const email = 'user2@email.com'
+      const hashEmail = hash(email)
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment1.save();
       await fragment1.setData(Buffer.from('test fragment by id'));
 
@@ -105,7 +112,7 @@ describe('GET /v1/fragments', () => {
       // make the request
       const res = await request(app)
         .get(`/v1/fragments/${fragment1.id}`)
-        .auth(fragment1.ownerId, 'password2');
+        .auth(email, 'password2');
 
       // check the response status code
       expect(res.statusCode).toBe(200);

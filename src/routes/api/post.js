@@ -12,7 +12,6 @@ router.post('/fragments', async (req, res, next) => {
   const API_URL = `http://${req.headers.host}`;
   try {
     logger.info(`API_URL: ${API_URL}`);
-    console.log(`API_URL: ${API_URL}`);
 
     // get the type from the request
     const { type } = contentType.parse(req);
@@ -26,17 +25,6 @@ router.post('/fragments', async (req, res, next) => {
     // get the body from the request
     const data = req.body;
     logger.debug(`req.body: ${data}`);
-
-    // get user email from auth header
-    const authHeader = req.headers.authorization;
-
-    logger.debug(`authHeader: ${authHeader}`);
-    const encodedCredentials = authHeader.split(' ')[1];
-    logger.debug(`encodedCredentials: ${encodedCredentials}`);
-    const decodedCredentials = Buffer.from(encodedCredentials, 'base64').toString('utf-8');
-    logger.debug(`decodedCredentials: ${decodedCredentials}`);
-    const email = decodedCredentials.split(':')[0];
-    logger.debug(`email: ${email}`);
 
     if (Buffer.isBuffer(data)) {
       // create a new fragment

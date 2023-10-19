@@ -10,17 +10,10 @@ const logger = require('../../logger');
  */
 module.exports = async (req, res) => {
   try {
+    
     // get user email from auth header
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      logger.warn('401 Unauthorized');
-      res.status(401).json(createErrorResponse(401, 'Unauthorized'));
-      return;
-    }
-    const encodedCredentials = authHeader.split(' ')[1];
-    const decodedCredentials = Buffer.from(encodedCredentials, 'base64').toString('utf-8');
-    const email = decodedCredentials.split(':')[0];
-    logger.debug(`email: ${email}`); // email is the ownerId
+    const email = req.user;
+    logger.debug(`get email: ${email}`); // email is the ownerId
 
     // check it the expand present and set to 1
     const isExpand = req.query.expand === '1';
