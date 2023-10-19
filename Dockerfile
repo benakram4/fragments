@@ -1,53 +1,47 @@
-#First Docket file for Lab05
+# stage 0: Install dependencies
+FROM node:18.18.2@sha256:a6385a6bb2fdcb7c48fc871e35e32af8daaa82c518900be49b76d10c005864c2 AS dependencies
 
-# Use node version 18.13.0
-FROM node:18.17.0
+LABEL maintainer="Ben Akram bakram4@myseneca.ca" \
+  description="Fragments node.js microservice"
 
-# The LABEL instruction adds key=value pairs with arbitrary metadata about your image.
-# https://docs.docker.com/engine/reference/builder/#label
-LABEL maintainer="Ben Akram bakram4@myseneca.ca"
-LABEL description="Fragments node.js microservice"
+ENV NODE_ENV=production
 
-# We define environment variables using the ENV instruction, which also uses key=value pairs like LABEL
-# https://docs.docker.com/engine/reference/builder/#env
-#  can be overridden at runtime using the --env, -e or --env-file flags.
-# We default to use port 8080 in our service
 ENV PORT=8080
+ENV NPM_CONFIG_LOGLEVEL=warn \
+  NPM_CONFIG_COLOR=false
 
-# Reduce npm spam when installing within Docker
-# https://docs.npmjs.com/cli/v8/using-npm/config#loglevel
-ENV NPM_CONFIG_LOGLEVEL=warn
-
-# Disable colour when run inside Docker
-# https://docs.npmjs.com/cli/v8/using-npm/config#color
-ENV NPM_CONFIG_COLOR=false
-
-# Set the working directory
-# Use /app as our working directory
 WORKDIR /app
 
-#  We use the COPY instruction to copy files and folders into our image
-# https://docs.docker.com/engine/reference/builder/#copy
-# Copy the package.json and package-lock.json files
-# into the working directory
 COPY package*.json ./
 
-# Install dependencies
-# We use the RUN instruction to execute a command and cache this layer 
-# https://docs.docker.com/engine/reference/builder/#run
-RUN npm install
+RUN npm ci --only=production
 
-# Copy the source code into the working directory
-# Copy src to /app/src/
+####################################################
+# stage 1: Production | run the app
+FROM node:18.18.2-alpine3.18@sha256:435dcad253bb5b7f347ebc69c8cc52de7c912eb7241098b920f2fc2d7843183d AS production
+
+# Tell docker that all future commands should run as the node user
+# because node user and group are allready created in the node image we don't need to create them 
+# https://docs.docker.com/develop/develop-images/instructions/#user
+USER node
+
+WORKDIR /app
+
+# copy the dependencies from the first stage
+COPY --from=dependencies /app .
+
+# add the rest of the app's source code
 COPY ./src ./src
-
-# Copy our HTPASSWD file
 COPY ./tests/.htpasswd ./tests/.htpasswd
 
-# Start the container by running our server
-CMD npm start
+# Define an automated healthcheck, using wget instead of curl to avoid another dependency
+# --quiet: Don't print anything to stdout
+# --spider: Don't download anything
+# https://www.gnu.org/software/wget/manual/wget.html
+HEALTHCHECK --interval=15s --timeout=30s --start-period=10s --retries=3  \
+  CMD wget --quiet --spider http://localhost:8080 || exit 1
 
-#We use EXPOSE in order to indicate the port(s) that a container will listen on when run. 
-# For example, a web server might EXPOSE 80, indicating that port 80 is the typical port used by this container.
-# We run our service on port 8080
+# use Node instead of npm to avoid a the extra npm layer
+CMD ["node", "./src/server.js"]
+
 EXPOSE 8080

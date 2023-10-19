@@ -6,6 +6,7 @@ tests/
 !tests/.htpasswd
 .env
 .eslintrc.js
+.prettier*
 .git/
 .gitignore
 .prettier*
