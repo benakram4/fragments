@@ -25,8 +25,8 @@ describe('GET /v1/fragments', () => {
     // Using a valid username/password pair should give a success result with a .fragments array
     test('authenticated users get a fragments array with expand flag', async () => {
       // create 2 fragments for the user
-      const email = 'user1@email.com'
-      const hashEmail = hash(email)
+      const email = 'user1@email.com';
+      const hashEmail = hash(email);
       const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment1.save();
       await fragment1.setData(Buffer.from('test fragment 1'));
@@ -35,9 +35,7 @@ describe('GET /v1/fragments', () => {
       await fragment2.setData(Buffer.from('test fragment 2'));
 
       // make the request
-      const res = await request(app)
-        .get('/v1/fragments?expand=1')
-        .auth(email, 'password1');
+      const res = await request(app).get('/v1/fragments?expand=1').auth(email, 'password1');
 
       // get the host header: res.req.getHeader('host')
       const host = res.req.getHeader('host');
@@ -65,8 +63,8 @@ describe('GET /v1/fragments', () => {
 
     test("authenticated users get a fragments array pf id's", async () => {
       // create 2 fragments for the user
-      const email = 'user2@email.com'
-      const hashEmail = hash(email)
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
       const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment1.save();
       await fragment1.setData(Buffer.from('test fragment 1'));
@@ -98,10 +96,10 @@ describe('GET /v1/fragments', () => {
   });
 
   describe('GET Fragment by id', () => {
-    test("Gets an authenticated user's fragment data with the given id", async () => {
+    test("Gets an authenticated user's fragment row data with the given id", async () => {
       // create a fragment for the user
-      const email = 'user2@email.com'
-      const hashEmail = hash(email)
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
       const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment1.save();
       await fragment1.setData(Buffer.from('test fragment by id'));
@@ -110,9 +108,7 @@ describe('GET /v1/fragments', () => {
       fragment1.data = await fragment1.getData();
 
       // make the request
-      const res = await request(app)
-        .get(`/v1/fragments/${fragment1.id}`)
-        .auth(email, 'password2');
+      const res = await request(app).get(`/v1/fragments/${fragment1.id}`).auth(email, 'password2');
 
       // check the response status code
       expect(res.statusCode).toBe(200);
@@ -124,6 +120,68 @@ describe('GET /v1/fragments', () => {
           data: Buffer.from(fragment1.data).toString('utf-8'),
         })
       );
+    });
+
+    test('no such fragment exists, returns an HTTP 404 with an appropriate error message', async () => {
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
+      await fragment1.save();
+
+      const fakeFragId = 'xxxxxxxx-e26c-4bf5-914c-c62d0b9ac0a2';
+
+      // make the request
+      const res = await request(app).get(`/v1/fragments/${fakeFragId}`).auth(email, 'password2');
+
+      expect(res.statusCode).toBe(404);
+      // check that error has a message
+      expect(res.body.error).toBeTruthy();
+    });
+  });
+
+  describe('GET Fragment by id/info', () => {
+    test("Gets an authenticated user's fragment metadata  with the given id", async () => {
+      // create a fragment for the user
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
+      await fragment1.save();
+      await fragment1.setData(Buffer.from('test fragment by id/info'));
+
+      // make the request
+      const res = await request(app)
+        .get(`/v1/fragments/${fragment1.id}/info`)
+        .auth(email, 'password2');
+
+      // check the response status code
+      expect(res.statusCode).toBe(200);
+
+      // check the response body
+      expect(res.body.status).toBe('ok');
+      // check all the fragment attributes using the fragments array with spread operator
+      expect(res.body).toEqual(
+        createSuccessResponse({
+          ...fragment1,
+        })
+      );
+    });
+
+    test('no such fragment exists, returns an HTTP 404 with an appropriate error message', async () => {
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
+      await fragment1.save();
+
+      const fakeFragId = 'xxxxxxxx-e26c-4bf5-914c-c62d0b9ac0a2';
+
+      // make the request
+      const res = await request(app)
+        .get(`/v1/fragments/${fakeFragId}/info`)
+        .auth(email, 'password2');
+
+      expect(res.statusCode).toBe(404);
+      // check that error has a message
+      expect(res.body.error).toBeTruthy();
     });
   });
 });

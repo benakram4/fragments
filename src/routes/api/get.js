@@ -10,7 +10,6 @@ const logger = require('../../logger');
  */
 module.exports = async (req, res) => {
   try {
-    
     // get user email from auth header
     const email = req.user;
     logger.debug(`get email: ${email}`); // email is the ownerId
@@ -22,39 +21,52 @@ module.exports = async (req, res) => {
     logger.debug(`isId: ${ownerID}`);
     logger.debug(`isExpand: ${isExpand}`);
 
+    // holders for multiple fragments
     let fragments = []; // array of fragments for get all fragments
+
+    // holders for single fragment
     let fragment = null; // fragment for get fragment by id
     let data = null; // data for get fragment by id
+    let isInfoReq = false; // check if the request is for info
+    if (req.path.includes('info')) {
+      isInfoReq = true;
+    }
 
     // get all fragments for the user with all attributes
     if (isExpand) {
       fragments = await Fragment.byUser(email, isExpand);
+      logger.debug(`GET/expand fragments: ${JSON.stringify(fragments, null, 2)}`);
     }
     // Gets an authenticated user's fragment data with the given id
     else if (ownerID) {
-      fragment = await Fragment.byId(email, ownerID);
-      fragment.data = await fragment.getData();
-      data = Buffer.from(fragment.data).toString('utf-8');
+      if (isInfoReq) {
+        fragment = await Fragment.byId(email, ownerID);
+
+        logger.debug(`GET/id/info fragment: ${JSON.stringify(fragment, null, 2)}`);
+      } else {
+        fragment = await Fragment.byId(email, ownerID);
+        fragment.data = await fragment.getData();
+        logger.debug(`GET/id fragment.data: ${fragment.data}`);
+        data = Buffer.from(fragment.data).toString('utf-8');
+        logger.debug(`GET/id data: ${data}`);
+      }
       // get all fragments for the user with only id attribute
     } else {
       fragments = await Fragment.byUser(email, false);
+      logger.debug(`GET fragments: ${JSON.stringify(fragments, null, 2)}`);
     }
 
-    // log all fragments attributes
-    fragments.forEach((fragment) => {
-      logger.debug(`fragment.id: ${fragment.id}`);
-      logger.debug(`fragment.ownerId: ${fragment.ownerId}`);
-      logger.debug(`fragment.type: ${fragment.type}`);
-      logger.debug(`fragment.size: ${fragment.size}`);
-      logger.debug(`fragment.created: ${fragment.created}`);
-      logger.debug(`fragment.updated: ${fragment.updated}`);
-    });
-
     // send the right response
-    if (data) {
+    if (data && !isInfoReq) {
       res.status(200).json(
         createSuccessResponse({
           data,
+        })
+      );
+    } else if (isInfoReq) {
+      res.status(200).json(
+        createSuccessResponse({
+          ...fragment,
         })
       );
     } else {
@@ -65,7 +77,7 @@ module.exports = async (req, res) => {
       );
     }
   } catch (err) {
-    logger.error(`Error in GET /fragments: ${err}`);
-    res.status(500).json(createErrorResponse(500, 'Internal Server Error'));
+    logger.error(`Error in GET /fragments: ${err.message}`);
+    res.status(404).json(createErrorResponse(404, err.message));
   }
 };

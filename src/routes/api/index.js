@@ -40,7 +40,11 @@ router.get('/fragments', require('./get'));
 router.get('/fragments?expand=1', require('./get'));
 
 // Define our fourth route, which will be: GET /v1/fragments/:id
+// Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
 router.get('/fragments/:id', require('./get'));
+
+// Define our fifth route, which will be: GET /v1/fragments/:id/info
+router.get('/fragments/:id/info', require('./get'));
 
 // Other routes will go here later on...
 
