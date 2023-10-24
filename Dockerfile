@@ -21,7 +21,7 @@ RUN npm ci --only=production
 FROM node:18.18.2-alpine3.18@sha256:435dcad253bb5b7f347ebc69c8cc52de7c912eb7241098b920f2fc2d7843183d AS production
 
 # Tell docker that all future commands should run as the node user
-# because node user and group are allready created in the node image we don't need to create them 
+# because node user and group are already created in the node image we don't need to create them 
 # https://docs.docker.com/develop/develop-images/instructions/#user
 USER node
 
@@ -42,6 +42,6 @@ HEALTHCHECK --interval=15s --timeout=30s --start-period=10s --retries=3  \
   CMD wget --quiet --spider http://localhost:8080 || exit 1
 
 # use Node instead of npm to avoid a the extra npm layer
-CMD ["node", "./src/server.js"]
+CMD ["node", "./src/index.js"]
 
 EXPOSE 8080

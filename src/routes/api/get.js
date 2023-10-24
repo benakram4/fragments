@@ -32,14 +32,14 @@ module.exports = async (req, res) => {
       isInfoReq = true;
     }
 
-    // get all fragments for the user with all attributes
+    // get all fragments for the user with all attributes with expand flag
     if (isExpand) {
       fragments = await Fragment.byUser(email, isExpand);
       logger.debug(`GET/expand fragments: ${JSON.stringify(fragments, null, 2)}`);
     }
     // Gets an authenticated user's fragment data with the given id
     else if (ownerID) {
-      if (isInfoReq) {
+      if (isInfoReq) { // get fragment info when id/info
         fragment = await Fragment.byId(email, ownerID);
 
         logger.debug(`GET/id/info fragment: ${JSON.stringify(fragment, null, 2)}`);
