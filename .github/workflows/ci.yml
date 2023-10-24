@@ -8,9 +8,13 @@ name: ci
 on:
   pull_request:
     branches:
+      - lab*
+      - assigment*
       - main
   push:
     branches:
+      - lab*
+      - assigment*
       - main
 
 jobs:
