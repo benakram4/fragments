@@ -14,7 +14,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 ####################################################
 # stage 1: Production | run the app
