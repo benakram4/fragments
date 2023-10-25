@@ -18,6 +18,9 @@ on:
     tags:
       # Any tag starting with v... should trigger this workflow.
       - 'v**'
+    branches:
+      - main
+      - lab*
 
 jobs:
   # NOTE: this assumes our CI jobs have already passed previously
