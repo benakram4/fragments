@@ -15,6 +15,7 @@ router.post('/fragments', async (req, res, next) => {
 
     // get the type from the request
     const { type } = contentType.parse(req);
+    logger.debug(`contentType.parse(req): ${type}`);
     // check if the type is supported
     if (!Fragment.isSupportedType(type)) {
       logger.warn(`415 type is not supported`);
@@ -50,7 +51,7 @@ router.post('/fragments', async (req, res, next) => {
             id: fragment.id,
             ownerId: fragment.ownerId,
             size: fragment.size,
-            type: fragment.type,
+            type: type,
             created: fragment.created,
             updated: fragment.updated,
           },
