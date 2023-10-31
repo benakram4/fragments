@@ -7,10 +7,11 @@ const wait = async (ms = 1000) => new Promise((resolve) => setTimeout(resolve, m
 const validTypes = [
   `text/plain`,
   `text/markdown`,
-  /*
-    Currently, only text/plain and text/markdown are supported. Others will be added later.
   `text/html`,
   `application/json`,
+  /*
+    Currently, only text/* and application/json are supported. Others will be added later.
+
   `image/png`,
   `image/jpeg`,
   `image/webp`,
@@ -41,6 +42,7 @@ describe('Fragment class', () => {
       const fragment2 = new Fragment({ ownerId: '1234', type: 'text/markdown', size: 0 });
       expect(fragment.type).toEqual('text/plain');
       expect(fragment2.type).toEqual('text/markdown');
+
     });
 
     test('type can include a charset', () => {
@@ -124,6 +126,10 @@ describe('Fragment class', () => {
       expect(Fragment.isSupportedType('text/plain; charset=utf-8')).toBe(true);
       expect(Fragment.isSupportedType('text/markdown')).toBe(true);
       expect(Fragment.isSupportedType('text/markdown; charset=utf-8')).toBe(true);
+      expect(Fragment.isSupportedType('text/html')).toBe(true);
+      expect(Fragment.isSupportedType('text/html; charset=utf-8')).toBe(true);
+      expect(Fragment.isSupportedType('application/json')).toBe(true);
+      expect(Fragment.isSupportedType('application/json; charset=utf-8')).toBe(true);
     });
 
     test('other types are not supported', () => {
@@ -178,7 +184,25 @@ describe('Fragment class', () => {
         type: 'text/markdown; charset=utf-8',
         size: 0,
       });
-      expect(fragment.formats).toEqual(['text/plain']);
+      expect(fragment.formats).toEqual(['text/plain', 'text/markdown', 'text/html']);
+    });
+
+    test('formats returns the expected result for html', () => {
+      const fragment = new Fragment({
+        ownerId: '1234',
+        type: 'text/html; charset=utf-8',
+        size: 0,
+      });
+      expect(fragment.formats).toEqual(['text/plain', 'text/html']);
+    });
+
+    test('formats returns the expected result for json', () => {
+      const fragment = new Fragment({
+        ownerId: '1234',
+        type: 'application/json; charset=utf-8',
+        size: 0,
+      });
+      expect(fragment.formats).toEqual(['text/plain', 'application/json']);
     });
   });
 

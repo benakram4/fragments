@@ -153,13 +153,20 @@ class Fragment {
     const formats = [];
 
     if (this.isText) {
+      if (this.mimeType.includes('text/plain')) {
+        formats.push('text/plain');
+      } else if (this.mimeType.includes('text/markdown')) {
+        formats.push('text/plain');
+        formats.push('text/markdown');
+        formats.push('text/html');
+      } else if (this.mimeType.includes('text/html')) {
+        formats.push('text/plain');
+        formats.push('text/html');
+      }
+    } else if (this.mimeType.includes('application/json')) {
       formats.push('text/plain');
-      // ! commented code is for future use
-      // formats.push('text/markdown');
-      // formats.push('text/html');
-      //? I think that we should add this one too or it has a special case?
-      // formats.push('application/json');
-    } else {
+      formats.push('application/json');
+    } else if (this.mimeType.includes('image/')) {
       // ! commented code is  for future use
       // formats.push('image/png');
       // formats.push('image/jpeg');
@@ -179,10 +186,11 @@ class Fragment {
     const validTypes = [
       `text/plain`,
       `text/markdown`,
-      /*
-        Currently, only text/plain and text/markdown are supported. Others will be added later.
       `text/html`,
       `application/json`,
+      /*
+        Currently, only text/* and application/json are supported. Others will be added later.
+
       `image/png`,
       `image/jpeg`,
       `image/webp`,
