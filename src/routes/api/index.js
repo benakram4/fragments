@@ -25,8 +25,6 @@ const rawBody = () =>
     },
   });
 
-
-
 // Define our second route, which will be: POST /v1/fragments
 // Use a raw body parser for POST, which will give a `Buffer` Object or `{}` at `req.body`
 // You can use Buffer.isBuffer(req.body) to test if it was parsed by the raw body parser.
@@ -39,12 +37,17 @@ router.get('/fragments', require('./get'));
 // where the expand flag is used to get full fragments
 router.get('/fragments?expand=1', require('./get'));
 
+// Define our sixth route, which will be: GET /v1/fragments/:id.ext
+router.get('/fragments/:id.:ext', require('./get'));
+
 // Define our fourth route, which will be: GET /v1/fragments/:id
 // Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
 router.get('/fragments/:id', require('./get'));
 
 // Define our fifth route, which will be: GET /v1/fragments/:id/info
 router.get('/fragments/:id/info', require('./get'));
+
+
 
 // Other routes will go here later on...
 

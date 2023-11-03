@@ -4,6 +4,8 @@
 const { createSuccessResponse, createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
+const MarkdownIt = require('markdown-it');
+const md = new MarkdownIt();
 
 /**
  * Get a list of fragments for the current user
@@ -18,8 +20,11 @@ module.exports = async (req, res) => {
     const isExpand = req.query.expand === '1';
     // get the fragment id if exist
     const ownerID = req.params.id;
+    // get the file extension
+    const ext = req.params.ext;
     logger.debug(`isId: ${ownerID}`);
     logger.debug(`isExpand: ${isExpand}`);
+    logger.debug(`ext: ${ext}`);
 
     // holders for multiple fragments
     let fragments = []; // array of fragments for get all fragments
@@ -39,16 +44,24 @@ module.exports = async (req, res) => {
     }
     // Gets an authenticated user's fragment data with the given id
     else if (ownerID) {
-      if (isInfoReq) { // get fragment info when id/info
+      if (isInfoReq) {
+        // get fragment info when id/info
         fragment = await Fragment.byId(email, ownerID);
 
         logger.debug(`GET/id/info fragment: ${JSON.stringify(fragment, null, 2)}`);
       } else {
+        logger.debug(`GET/id xxx ownerID: ${ownerID}`);
         fragment = await Fragment.byId(email, ownerID);
         fragment.data = await fragment.getData();
         logger.debug(`GET/id fragment.data: ${fragment.data}`);
         data = Buffer.from(fragment.data).toString('utf-8');
         logger.debug(`GET/id data: ${data}`);
+        // If the extension is 'html' and the fragment's format is 'md', convert the data to HTML
+        if (ext === 'html' && fragment.type === 'text/markdown') {
+          logger.debug(`Before GET/id.ext data: ${data}`);
+          data = md.render(data);
+          logger.debug(`After GET/id.ext data: ${data}`);
+        }
       }
       // get all fragments for the user with only id attribute
     } else {
@@ -58,11 +71,15 @@ module.exports = async (req, res) => {
 
     // send the right response
     if (data && !isInfoReq) {
-      res.status(200).json(
-        createSuccessResponse({
-          data,
-        })
-      );
+      if (ext) {
+        res.status(200).send(data);
+      } else {
+        res.status(200).json(
+          createSuccessResponse({
+            data,
+          })
+        );
+      }
     } else if (isInfoReq) {
       res.status(200).json(
         createSuccessResponse({

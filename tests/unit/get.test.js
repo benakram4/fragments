@@ -153,6 +153,7 @@ describe('GET /v1/fragments', () => {
         .get(`/v1/fragments/${fragment1.id}/info`)
         .auth(email, 'password2');
 
+      logger.debug(`GET info res.body: ${JSON.stringify(res.body, null, 2)}`);
       // check the response status code
       expect(res.statusCode).toBe(200);
 
@@ -168,9 +169,6 @@ describe('GET /v1/fragments', () => {
 
     test('no such fragment exists, returns an HTTP 404 with an appropriate error message', async () => {
       const email = 'user2@email.com';
-      const hashEmail = hash(email);
-      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
-      await fragment1.save();
 
       const fakeFragId = 'xxxxxxxx-e26c-4bf5-914c-c62d0b9ac0a2';
 
@@ -182,6 +180,34 @@ describe('GET /v1/fragments', () => {
       expect(res.statusCode).toBe(404);
       // check that error has a message
       expect(res.body.error).toBeTruthy();
+    });
+  });
+
+  describe('GET Fragment by id.ext', () => {
+    test("Gets an authenticated user's fragment data with the given id and extension, md to html", async () => {
+      // create a fragment for the user
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/markdown' });
+      await fragment1.save();
+      await fragment1.setData(Buffer.from('# test fragment by id.ext md to html'));
+
+      // make the request for the HTML version of the fragment
+      const res = await request(app)
+        .get(`/v1/fragments/${fragment1.id}.html`)
+        .auth(email, 'password2');
+
+      logger.debug(`GET ext res: ${JSON.stringify(res, null, 2)}`);
+      // check the response status code
+      expect(res.statusCode).toBe(200);
+      //expect(res.body.status).toBe('ok');
+
+      // check that the response contains the expected HTML
+      expect(res.text).toBe('<h1>test fragment by id.ext md to html</h1>\n');
+      // check Content-Type header
+      logger.debug(` xxx res.headers.content-type: ${res.headers['content-type']}`);
+      expect(res.headers['content-type']).toBe('text/html; charset=utf-8');
+      
     });
   });
 });
