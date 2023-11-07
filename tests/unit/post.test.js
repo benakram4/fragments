@@ -37,7 +37,6 @@ describe('POST /fragments', () => {
         type: res.body.fragment.type,
         created: res.body.fragment.created,
         updated: res.body.fragment.updated,
-        // data: res.body.fragment.data, // ? Buffer.from(data) or do we even need this?
         links: res.body.fragment.links,
       },
     });

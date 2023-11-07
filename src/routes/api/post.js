@@ -47,14 +47,7 @@ router.post('/fragments', async (req, res, next) => {
 
       res.status(201).json(
         createSuccessResponse({
-          fragment: {
-            id: fragment.id,
-            ownerId: fragment.ownerId,
-            size: fragment.size,
-            type: type,
-            created: fragment.created,
-            updated: fragment.updated,
-          },
+          fragment: fragment,
         })
       );
     } else {
