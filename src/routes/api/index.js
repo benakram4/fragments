@@ -33,10 +33,6 @@ router.post('/fragments', rawBody(), require('./post'));
 // Define our first route, which will be: GET /v1/fragments
 router.get('/fragments', require('./get'));
 
-// Define our third route, which will be: GET /v1/fragments?expand=1
-// where the expand flag is used to get full fragments
-router.get('/fragments?expand=1', require('./get'));
-
 // Define our sixth route, which will be: GET /v1/fragments/:id.ext
 router.get('/fragments/:id.:ext', require('./get'));
 

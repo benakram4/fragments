@@ -14,15 +14,15 @@ module.exports = async (req, res) => {
   try {
     // get user email from auth header
     const email = req.user;
-    logger.debug(`get email: ${email}`); // email is the ownerId
+    logger.debug(`get email: ${email}`); // email is the ownerID
 
     // check it the expand present and set to 1
     const isExpand = req.query.expand === '1';
     // get the fragment id if exist
-    const ownerID = req.params.id;
+    const fragID = req.params.id;
     // get the file extension
     const ext = req.params.ext;
-    logger.debug(`isId: ${ownerID}`);
+    logger.debug(`isId: ${fragID}`);
     logger.debug(`isExpand: ${isExpand}`);
     logger.debug(`ext: ${ext}`);
 
@@ -43,15 +43,14 @@ module.exports = async (req, res) => {
       logger.debug(`GET/expand fragments: ${JSON.stringify(fragments, null, 2)}`);
     }
     // Gets an authenticated user's fragment data with the given id
-    else if (ownerID) {
+    else if (fragID) {
       if (isInfoReq) {
         // get fragment info when id/info
-        fragment = await Fragment.byId(email, ownerID);
+        fragment = await Fragment.byId(email, fragID);
 
         logger.debug(`GET/id/info fragment: ${JSON.stringify(fragment, null, 2)}`);
       } else {
-        logger.debug(`GET/id xxx ownerID: ${ownerID}`);
-        fragment = await Fragment.byId(email, ownerID);
+        fragment = await Fragment.byId(email, fragID);
         fragment.data = await fragment.getData();
         logger.debug(`GET/id fragment.data: ${fragment.data}`);
         data = Buffer.from(fragment.data).toString('utf-8');
