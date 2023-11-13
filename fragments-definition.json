@@ -71,7 +71,7 @@
       "dockerLabels": null,
       "systemControls": null,
       "privileged": null,
-      "name": "fragments"
+      "name": "custom"
     }
   ],
   "placementConstraints": [],
