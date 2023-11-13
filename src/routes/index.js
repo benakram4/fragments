@@ -1,6 +1,7 @@
 // src/routes/index.js
 
 const express = require('express');
+const { hostname } = require('os');
 
 // Import the functions that we'll use to create our responses
 const { createSuccessResponse } = require('../response');
@@ -31,9 +32,11 @@ router.get('/', (req, res) => {
   res.status(200).json(
     createSuccessResponse({
       status: 'ok',
-      author,
+      author: author,
       githubUrl: repository.url,
       version,
+      // Include the hostname in the response
+      hostname: hostname(),
     })
   );
 });
