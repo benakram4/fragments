@@ -28,19 +28,19 @@
       "environment": [
         {
           "name": "AWS_COGNITO_CLIENT_ID",
-          "value":
+          "value": "add value as secret"
         },
         {
           "name": "AWS_COGNITO_POOL_ID",
-          "value":
+          "value": "add value as secret"
         },
         {
           "name": "AWS_REGION",
-          "value": 
+          "value": "add value as secret"
         },
         {
           "name": "PORT",
-          "value":
+          "value": "add value as secret"
         }
       ],
       "resourceRequirements": null,
