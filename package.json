@@ -8,6 +8,7 @@
     "test:watch": "jest -c jest.config.js --runInBand --watch --",
     "test": "jest -c jest.config.js --runInBand --",
     "coverage": "jest -c jest.config.js --runInBand --coverage",
+    "test:integration": "hurl --test --glob \"tests/integration/**/*.hurl\"",
     "lint": "eslint --config .eslintrc.js \"./src/**/*.js\" \"tests/**/*.js\"",
     "start": "node src/index.js",
     "dev": "cross-env LOG_LEVEL=debug nodemon ./src/index.js --watch src",
@@ -21,6 +22,7 @@
   "author": "Ben Akram",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@orangeopensource/hurl": "^4.1.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.49.0",
     "eslint-config-standard": "^17.1.0",

@@ -41,14 +41,23 @@ module.exports = async (req, res) => {
     if (isExpand) {
       fragments = await Fragment.byUser(email, isExpand);
       logger.debug(`GET/expand fragments: ${JSON.stringify(fragments, null, 2)}`);
+      res.status(200).json(
+        createSuccessResponse({
+          fragments: [...fragments],
+        })
+      );
     }
     // Gets an authenticated user's fragment data with the given id
     else if (fragID) {
       if (isInfoReq) {
         // get fragment info when id/info
         fragment = await Fragment.byId(email, fragID);
-
         logger.debug(`GET/id/info fragment: ${JSON.stringify(fragment, null, 2)}`);
+        res.status(200).json(
+          createSuccessResponse({
+            ...fragment,
+          })
+        );
       } else {
         fragment = await Fragment.byId(email, fragID);
         fragment.data = await fragment.getData();
@@ -58,34 +67,22 @@ module.exports = async (req, res) => {
         // If the extension is 'html' and the fragment's format is 'md', convert the data to HTML
         if (ext === 'html' && fragment.type === 'text/markdown') {
           logger.debug(`Before GET/id.ext data: ${data}`);
+          // log type
+          logger.debug(`xyyy GET/id.ext type: ${fragment.type}`);
           data = md.render(data);
           logger.debug(`After GET/id.ext data: ${data}`);
+          res.status(200).send(data);
+        } else {
+          // set the content-type header
+          res.setHeader('Content-Type', fragment.type);
+          logger.debug(`xyxy GET/id type: ${fragment.type}`);
+          res.status(200).send(data);
         }
       }
       // get all fragments for the user with only id attribute
     } else {
       fragments = await Fragment.byUser(email, false);
       logger.debug(`GET fragments: ${JSON.stringify(fragments, null, 2)}`);
-    }
-
-    // send the right response
-    if (data && !isInfoReq) {
-      if (ext) {
-        res.status(200).send(data);
-      } else {
-        res.status(200).json(
-          createSuccessResponse({
-            data,
-          })
-        );
-      }
-    } else if (isInfoReq) {
-      res.status(200).json(
-        createSuccessResponse({
-          ...fragment,
-        })
-      );
-    } else {
       res.status(200).json(
         createSuccessResponse({
           fragments: [...fragments],

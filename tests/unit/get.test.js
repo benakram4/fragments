@@ -100,26 +100,26 @@ describe('GET /v1/fragments', () => {
       // create a fragment for the user
       const email = 'user2@email.com';
       const hashEmail = hash(email);
-      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain; charset=utf-8' });
       await fragment1.save();
       await fragment1.setData(Buffer.from('test fragment by id'));
 
       // get the data of the fragment
       fragment1.data = await fragment1.getData();
+      // log the type
+      logger.debug(`yyy fragment1.type: ${fragment1.type}`);
 
       // make the request
       const res = await request(app).get(`/v1/fragments/${fragment1.id}`).auth(email, 'password2');
 
       // check the response status code
       expect(res.statusCode).toBe(200);
-      // check that only one piece of data is returned
-      expect(Array.isArray(res.body)).toBe(false);
+
       // check the response body
-      expect(res.body).toEqual(
-        createSuccessResponse({
-          data: Buffer.from(fragment1.data).toString('utf-8'),
-        })
-      );
+      expect(res.text).toBe('test fragment by id');
+      // check Content-Type header
+      logger.debug(` yyy res.headers.content-type: ${res.headers['content-type']}`);
+      expect(res.headers['content-type']).toBe('text/plain; charset=utf-8');
     });
 
     test('no such fragment exists, returns an HTTP 404 with an appropriate error message', async () => {
@@ -200,14 +200,12 @@ describe('GET /v1/fragments', () => {
       logger.debug(`GET ext res: ${JSON.stringify(res, null, 2)}`);
       // check the response status code
       expect(res.statusCode).toBe(200);
-      //expect(res.body.status).toBe('ok');
 
       // check that the response contains the expected HTML
       expect(res.text).toBe('<h1>test fragment by id.ext md to html</h1>\n');
       // check Content-Type header
       logger.debug(` xxx res.headers.content-type: ${res.headers['content-type']}`);
       expect(res.headers['content-type']).toBe('text/html; charset=utf-8');
-      
     });
   });
 });
