@@ -39,6 +39,10 @@
           "value": "add value as secret"
         },
         {
+          "name": "AWS_S3_BUCKET_NAME",
+          "value": "bakram4-fragments"
+        },
+        {
           "name": "PORT",
           "value": "add value as secret"
         }
@@ -76,7 +80,7 @@
   ],
   "placementConstraints": [],
   "memory": "512",
-  "taskRoleArn": null,
+  "taskRoleArn": "arn:aws:iam::991912750765:role/LabRole",
   "compatibilities": ["EC2", "FARGATE"],
   "taskDefinitionArn": "arn:aws:ecs:us-east-1:991912750765:task-definition/fragments-task:1",
   "family": "fragments-task",

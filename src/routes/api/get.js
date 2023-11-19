@@ -67,15 +67,12 @@ module.exports = async (req, res) => {
         // If the extension is 'html' and the fragment's format is 'md', convert the data to HTML
         if (ext === 'html' && fragment.type === 'text/markdown') {
           logger.debug(`Before GET/id.ext data: ${data}`);
-          // log type
-          logger.debug(`xyyy GET/id.ext type: ${fragment.type}`);
           data = md.render(data);
           logger.debug(`After GET/id.ext data: ${data}`);
           res.status(200).send(data);
         } else {
           // set the content-type header
           res.setHeader('Content-Type', fragment.type);
-          logger.debug(`xyxy GET/id type: ${fragment.type}`);
           res.status(200).send(data);
         }
       }

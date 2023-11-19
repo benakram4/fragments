@@ -1,14 +1,12 @@
 // src/routes/api/post.js
 
-const express = require('express');
 const contentType = require('content-type');
 const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
 const { createErrorResponse, createSuccessResponse } = require('../../response');
 
-const router = express.Router();
 
-router.post('/fragments', async (req, res, next) => {
+module.exports = async (req, res, next) => {
   const API_URL = `http://${req.headers.host}`;
   try {
     logger.info(`API_URL: ${API_URL}`);
@@ -58,6 +56,4 @@ router.post('/fragments', async (req, res, next) => {
     logger.error(`Error in POST /fragments: ${err}`);
     next(err);
   }
-});
-
-module.exports = router;
+};

@@ -30,18 +30,16 @@ const rawBody = () =>
 // You can use Buffer.isBuffer(req.body) to test if it was parsed by the raw body parser.
 router.post('/fragments', rawBody(), require('./post'));
 
-// Define our first route, which will be: GET /v1/fragments
 router.get('/fragments', require('./get'));
 
-// Define our sixth route, which will be: GET /v1/fragments/:id.ext
 router.get('/fragments/:id.:ext', require('./get'));
 
-// Define our fourth route, which will be: GET /v1/fragments/:id
 // Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
 router.get('/fragments/:id', require('./get'));
 
-// Define our fifth route, which will be: GET /v1/fragments/:id/info
 router.get('/fragments/:id/info', require('./get'));
+
+router.delete('/fragments/:id', require('./delete')); 
 
 
 
