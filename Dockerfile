@@ -38,8 +38,8 @@ COPY ./tests/.htpasswd ./tests/.htpasswd
 # --quiet: Don't print anything to stdout
 # --spider: Don't download anything
 # https://www.gnu.org/software/wget/manual/wget.html
-# HEALTHCHECK --interval=15s --timeout=30s --start-period=10s --retries=3  \
-#   CMD wget --quiet --spider http://localhost:8080 || exit 1
+HEALTHCHECK --interval=15s --timeout=30s --start-period=10s --retries=3  \
+  CMD wget --quiet --spider http://localhost:8080 || exit 1
 
 # use Node instead of npm to avoid a the extra npm layer
 CMD ["node", "./src/index.js"]
