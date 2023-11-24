@@ -4,6 +4,7 @@ const contentType = require('content-type');
 const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
 const { createErrorResponse, createSuccessResponse } = require('../../response');
+const sharp = require('sharp'); // for image processing
 
 
 module.exports = async (req, res, next) => {
@@ -31,10 +32,22 @@ module.exports = async (req, res, next) => {
         ownerId: req.user,
         type: type,
       });
-
-      logger.debug(`fragment ownerId: ${fragment.ownerId}, saving fragment...`);
       await fragment.save();
-      await fragment.setData(data);
+      if(type.startsWith('image/')) {
+        // resize the image
+        const resizedImage = await sharp(data)
+          .resize(1000, 800)
+          .toBuffer();
+        logger.debug(`resizedImage: ${resizedImage}`);
+        // set the data
+        await fragment.setData(resizedImage);
+      }
+      else {
+        // set the data
+        await fragment.setData(data);
+      }
+
+      logger.info(`fragment ownerId: ${fragment.ownerId}, saving fragment...`);
       logger.debug(`fragment size: ${fragment.size}`);
       logger.debug(`fragment saved`);
 

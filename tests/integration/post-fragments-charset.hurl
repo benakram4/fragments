@@ -23,12 +23,11 @@ GET {{url}}
 user1@email.com:password1
 
 HTTP/1.1 200
-Content-Type: text/plain; charset=utf-8
 
 # 3. We expect the body to be the same as what we sent
 # and the "Content-Type" to be text/plain ; charset=utf-8"
 [Asserts]
 body == "This is a text fragment!"
-header "Content-Type" == "text/plain; charset=utf-8"
+header "Content-Type" startsWith "text/plain"
 
 

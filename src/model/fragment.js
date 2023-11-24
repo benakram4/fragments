@@ -167,11 +167,10 @@ class Fragment {
       formats.push('text/plain');
       formats.push('application/json');
     } else if (this.mimeType.includes('image/')) {
-      // ! commented code is  for future use
-      // formats.push('image/png');
-      // formats.push('image/jpeg');
-      // formats.push('image/webp');
-      // formats.push('image/gif');
+      formats.push('image/png');
+      formats.push('image/jpeg');
+      formats.push('image/webp');
+      formats.push('image/gif');
     }
 
     return formats;
@@ -188,14 +187,10 @@ class Fragment {
       `text/markdown`,
       `text/html`,
       `application/json`,
-      /*
-        Currently, only text/* and application/json are supported. Others will be added later.
-
       `image/png`,
       `image/jpeg`,
       `image/webp`,
       `image/gif`,
-      */
     ];
 
     // deals with the case where the type includes a charset

@@ -61,19 +61,25 @@ module.exports = async (req, res) => {
       } else {
         fragment = await Fragment.byId(email, fragID);
         fragment.data = await fragment.getData();
-        logger.debug(`GET/id fragment.data: ${fragment.data}`);
-        data = Buffer.from(fragment.data).toString('utf-8');
-        logger.debug(`GET/id data: ${data}`);
-        // If the extension is 'html' and the fragment's format is 'md', convert the data to HTML
-        if (ext === 'html' && fragment.type === 'text/markdown') {
-          logger.debug(`Before GET/id.ext data: ${data}`);
-          data = md.render(data);
-          logger.debug(`After GET/id.ext data: ${data}`);
-          res.status(200).send(data);
-        } else {
-          // set the content-type header
+
+        if (fragment.type.startsWith('image/')) {
           res.setHeader('Content-Type', fragment.type);
-          res.status(200).send(data);
+          res.status(200).send(fragment.data);
+        } else {
+          logger.debug(`GET/id fragment.data: ${fragment.data}`);
+          data = Buffer.from(fragment.data).toString('utf-8');
+          logger.debug(`GET/id data: ${data}`);
+          // If the extension is 'html' and the fragment's format is 'md', convert the data to HTML
+          if (ext === 'html' && fragment.type === 'text/markdown') {
+            logger.debug(`Before GET/id.ext data: ${data}`);
+            data = md.render(data);
+            logger.debug(`After GET/id.ext data: ${data}`);
+            res.status(200).send(data);
+          } else {
+            // set the content-type header
+            res.setHeader('Content-Type', fragment.type);
+            res.status(200).send(data);
+          }
         }
       }
       // get all fragments for the user with only id attribute
