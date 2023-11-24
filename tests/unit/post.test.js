@@ -53,8 +53,6 @@ describe('POST /fragments', () => {
     expect(res.body).toEqual(retResponse);
   });
 
-  const sharp = require('sharp');
-
   test('Auth user post an image type', async () => {
     // Create a small PNG image with sharp
     const imgData = await sharp({
