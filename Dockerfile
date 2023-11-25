@@ -14,7 +14,9 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --omit=dev
+# Install sharp module and other dependencies in a single RUN command
+RUN npm ci --omit=dev && \
+  npm install --platform=linuxmusl --arch=x64 sharp@0.32.5 
 
 ####################################################
 # stage 1: Production | run the app
