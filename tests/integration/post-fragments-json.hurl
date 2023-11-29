@@ -8,9 +8,7 @@ Content-Type: application/json
 [BasicAuth]
 user1@email.com:password1
 # Body of the request goes in ```...``` when it's a string
-{
-  "name": "ben"
-}
+{"name":"ben"}
 
 # 1. We expect to get back an HTTP 201
 HTTP/1.1 201
@@ -31,7 +29,7 @@ jsonpath "$.fragment.created" isString
 jsonpath "$.fragment.updated" isString
 jsonpath "$.fragment.type" == "application/json"
 # 19 is the length of our fragment data: 'This is a fragment!'
-jsonpath "$.fragment.size" == 21
+jsonpath "$.fragment.size" == 14
 # Capture the Location URL into a variable named `url`
 [Captures]
 url: header "Location"
@@ -42,12 +40,10 @@ GET {{url}}
 user1@email.com:password1
 
 HTTP/1.1 200
-Content-Length: 21
+Content-Length: 14
 Content-Type: application/json; charset=utf-8
 
-{
-  "name": "ben"
-}
+{"name":"ben"}
 
 
 
