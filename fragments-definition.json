@@ -45,6 +45,10 @@
         {
           "name": "PORT",
           "value": "add value as secret"
+        },
+        {
+          "name": "AWS_DYNAMODB_TABLE_NAME",
+          "value": "fragments"
         }
       ],
       "resourceRequirements": null,
