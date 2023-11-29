@@ -32,8 +32,6 @@ module.exports = async (req, res, next) => {
         ownerId: req.user,
         type: type,
       });
-
-      logger.debug(`fragment ownerId: ${fragment.ownerId}, saving fragment...`);
       await fragment.save();
       if(type.startsWith('image/')) {
         // resize the image
