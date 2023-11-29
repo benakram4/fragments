@@ -14,7 +14,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev && \
+  npm install --platform=linuxmusl --arch=x64 sharp@0.32.5 
 
 ####################################################
 # stage 1: Production | run the app

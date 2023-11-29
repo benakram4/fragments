@@ -11,17 +11,19 @@ services:
     build: .
     # Environment variables to use
     environment:
+      # Set the NODE_ENV to production to test with cognito
+      - NODE_ENV=production
       # Our API will be running on http://localhost:8080
       - API_URL=http://localhost:8080
       # Use Basic Auth (for running tests, CI)
       - HTPASSWD_FILE=./tests/.htpasswd
       # Use the LOG_LEVEL set in the host environment, or default to info
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
       - AWS_REGION=us-east-1
       - AWS_DEFAULT_REGION=us-east-1
-      - AWS_SESSION_TOKEN=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_ACCESS_KEY_ID=test
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-test}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-test}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-test}
       # Use the LocalStack endpoint vs. AWS for S3 AWS SDK clients.
       # NOTE: we use Docker's internal network to the localstack container
       - AWS_S3_ENDPOINT_URL=http://localstack:4566
@@ -36,7 +38,7 @@ services:
     ports:
       - '8080:8080'
 
-    # DynamoDB Local, see: https://hub.docker.com/r/amazon/dynamodb-local
+  # DynamoDB Local, see: https://hub.docker.com/r/amazon/dynamodb-local
   dynamodb-local:
     container_name: dynamodb-local
     image: amazon/dynamodb-local

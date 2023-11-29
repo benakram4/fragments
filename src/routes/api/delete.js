@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
     logger.debug(`DELETE /fragments/${fragmentID}, ownerID: ${ownerID}`);
     const fragment = await Fragment.byId(ownerID, fragmentID);
     logger.debug(`fragment to be deleted: ${JSON.stringify(fragment, null, 2)}`);
-    await Fragment.delete(ownerID, req.params.id);
+    await Fragment.delete(ownerID, fragmentID);
     res.status(200).json(createSuccessResponse());
   } catch (err) {
     logger.error(`Error in DELETE /fragments: ${err}`);

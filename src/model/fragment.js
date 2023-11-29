@@ -64,10 +64,15 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    logger.debug(`byUser ownerId: ${ownerId}`);
-    const fragments = await listFragments(ownerId, expand);
-    logger.debug(`byUser fragments: ${fragments}`);
-    return fragments;
+    try {
+      logger.debug(`byUser ownerId: ${ownerId}`);
+      const fragments = await listFragments(ownerId, expand);
+      logger.debug(`byUser fragments: ${fragments}`);
+      return fragments;
+    } catch (err) {
+      logger.error({ err, ownerId }, 'Error retrieving fragments by user');
+      throw err;
+    }
   }
 
   /**
@@ -77,11 +82,17 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    const fragment = await readFragment(ownerId, id);
-    if (!fragment) {
-      throw new Error(`Fragment with id ${id} not found`);
+    try {
+      const fragment = await readFragment(ownerId, id);
+      if (!fragment) {
+        throw new Error(`Fragment with id ${id} not found`);
+      }
+      const retFragment = new Fragment(fragment);
+      return retFragment;
+    } catch (err) {
+      logger.error(`Error in byId: ${err}`);
+      throw err;
     }
-    return fragment;
   }
 
   /**
@@ -90,8 +101,19 @@ class Fragment {
    * @param {string} id fragment's id
    * @returns Promise<void>
    */
-  static delete(ownerId, id) {
-    return deleteFragment(ownerId, id);
+  /**
+   * Delete the user's fragment data and metadata for the given id
+   * @param {string} ownerId user's hashed email
+   * @param {string} id fragment's id
+   * @returns Promise<void>
+   */
+  static async delete(ownerId, id) {
+    try {
+      await deleteFragment(ownerId, id);
+    } catch (err) {
+      logger.error({ err, ownerId, id }, 'Error deleting fragment');
+      throw err;
+    }
   }
 
   /**
@@ -118,13 +140,18 @@ class Fragment {
    * @returns Promise<void>
    */
   async setData(data) {
-    // throws if not give a Buffer
-    if (!data) {
-      throw new Error(`data is required, got data=${data}`);
+    try {
+      // throws if not give a Buffer
+      if (!data) {
+        throw new Error(`data is required, got data=${data}`);
+      }
+      this.size = Buffer.byteLength(data);
+      this.updated = new Date().toUTCString();
+      await writeFragmentData(this.ownerId, this.id, data);
+    } catch (err) {
+      logger.error(`Error in setData: ${err}`);
+      throw Error(`Error in setData: ${err}`);
     }
-    this.size = Buffer.byteLength(data);
-    this.updated = new Date().toUTCString();
-    await writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -167,11 +194,10 @@ class Fragment {
       formats.push('text/plain');
       formats.push('application/json');
     } else if (this.mimeType.includes('image/')) {
-      // ! commented code is  for future use
-      // formats.push('image/png');
-      // formats.push('image/jpeg');
-      // formats.push('image/webp');
-      // formats.push('image/gif');
+      formats.push('image/png');
+      formats.push('image/jpeg');
+      formats.push('image/webp');
+      formats.push('image/gif');
     }
 
     return formats;
@@ -188,14 +214,10 @@ class Fragment {
       `text/markdown`,
       `text/html`,
       `application/json`,
-      /*
-        Currently, only text/* and application/json are supported. Others will be added later.
-
       `image/png`,
       `image/jpeg`,
       `image/webp`,
       `image/gif`,
-      */
     ];
 
     // deals with the case where the type includes a charset
