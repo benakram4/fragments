@@ -46,6 +46,8 @@ module.exports = async (req, res, next) => {
         // set the data
         await fragment.setData(data);
       }
+      await fragment.save();
+
 
       logger.info(`fragment ownerId: ${fragment.ownerId}, saving fragment...`);
       logger.debug(`fragment size: ${fragment.size}`);

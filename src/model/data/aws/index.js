@@ -8,6 +8,7 @@ const {
   GetCommand,
   QueryCommand,
   DeleteCommand,
+  UpdateCommand,
 } = require('@aws-sdk/lib-dynamodb');
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
@@ -19,7 +20,7 @@ async function writeFragment(fragment) {
     Item: fragment,
   };
 
-  logger.debug({ params, fragment }, 'writing fragment to DynamoDB');
+  logger.debug('writing fragment to DynamoDB: ', { params, fragment });
   // Create a PUT command to send to DynamoDB
   const command = new PutCommand(params);
 
@@ -71,6 +72,30 @@ async function writeFragmentData(ownerId, id, data) {
   try {
     // Use our client to send the command
     await s3Client.send(command);
+
+    // Calculate the size of the uploaded data
+    const size = Buffer.byteLength(data, 'utf8');
+
+    // Create the UPDATE API params for DynamoDB
+    const dynamoDBParams = {
+      TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+      Key: {
+        ownerId: ownerId,
+        id: id,
+      },
+      UpdateExpression: 'set #size = :size',
+      ExpressionAttributeNames: {
+        '#size': 'size',
+      },
+      ExpressionAttributeValues: {
+        ':size': size,
+      },
+    };
+
+    // Create an UPDATE Item command to send to DynamoDB
+    const dynamoDBCommand = new UpdateCommand(dynamoDBParams);
+    // Use our client to send the command to DynamoDB
+    await ddbDocClient.send(dynamoDBCommand);
   } catch (err) {
     // If anything goes wrong, log enough info that we can debug
     const { Bucket, Key } = params;

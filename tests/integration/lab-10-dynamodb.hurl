@@ -93,6 +93,8 @@ jsonpath "$.ownerId" matches "^[0-9a-fA-F]+$"
 jsonpath "$.created" isString
 jsonpath "$.updated" isString
 jsonpath "$.type" == "text/markdown"
+jsonpath "$.size" == 22
+
 
 # GET all of the fragments for the same authorized 
 # user without expanding them

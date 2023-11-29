@@ -53,6 +53,7 @@ module.exports = async (req, res) => {
         // get fragment info when id/info
         fragment = await Fragment.byId(email, fragID);
         logger.debug(`GET/id/info fragment: ${JSON.stringify(fragment, null, 2)}`);
+        logger.debug(`GET/id/info fragment.size: ${fragment.size}`);
         res.status(200).json(
           createSuccessResponse({
             ...fragment,
