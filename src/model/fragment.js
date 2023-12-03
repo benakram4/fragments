@@ -91,16 +91,10 @@ class Fragment {
       return retFragment;
     } catch (err) {
       logger.error(`Error in byId: ${err}`);
-      throw err;
+      throw new Error(`Error in byId: ${err}`);
     }
   }
 
-  /**
-   * Delete the user's fragment data and metadata for the given id
-   * @param {string} ownerId user's hashed email
-   * @param {string} id fragment's id
-   * @returns Promise<void>
-   */
   /**
    * Delete the user's fragment data and metadata for the given id
    * @param {string} ownerId user's hashed email
@@ -112,7 +106,7 @@ class Fragment {
       await deleteFragment(ownerId, id);
     } catch (err) {
       logger.error({ err, ownerId, id }, 'Error deleting fragment');
-      throw err;
+      throw new Error(`Error deleting fragment: ${err}`);
     }
   }
 
@@ -120,18 +114,30 @@ class Fragment {
    * Saves the current fragment to the database
    * @returns Promise<void>
    */
-  save() {
-    // update the updated date/time of the fragment
-    this.updated = new Date().toUTCString();
-    return writeFragment(this);
+  async save() {
+    try {
+      // update the updated date/time of the fragment
+      this.updated = new Date().toUTCString();
+      await writeFragment(this);
+    } catch (error) {
+      // handle or throw the error
+      logger.error(`Failed to save fragment to database ${error}`);
+      throw new Error(`Failed to save fragment to database ${error}`);
+    }
   }
 
   /**
    * Gets the fragment's data from the database
    * @returns Promise<Buffer>
    */
-  getData() {
-    return readFragmentData(this.ownerId, this.id);
+  async getData() {
+    try {
+      return await readFragmentData(this.ownerId, this.id);
+    } catch (error) {
+      // handle or throw the error
+      logger.error(`Failed to get fragment data from database ${error}`);
+      throw new Error(`Failed to get fragment data from database ${error}`);
+    }
   }
 
   /**
@@ -150,7 +156,7 @@ class Fragment {
       await writeFragmentData(this.ownerId, this.id, data);
     } catch (err) {
       logger.error(`Error in setData: ${err}`);
-      throw Error(`Error in setData: ${err}`);
+      throw new Error(`Error in setData: ${err}`);
     }
   }
 

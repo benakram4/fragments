@@ -20,7 +20,6 @@ module.exports = async (req, res, next) => {
       logger.warn(`415 type is not supported`);
       res.status(415).json(createErrorResponse(415, 'Unsupported Media Type'));
     }
-    logger.debug(`type: ${type}`);
 
     // get the body from the request
     const data = req.body;

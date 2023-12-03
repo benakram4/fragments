@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
     const fragID = req.params.id;
     // get the file extension
     const ext = req.params.ext;
-    logger.debug(`isId: ${fragID}`);
+    logger.debug(`fragId: ${fragID}`);
     logger.debug(`isExpand: ${isExpand}`);
     logger.debug(`ext: ${ext}`);
 
