@@ -66,34 +66,35 @@ async function writeFragmentData(ownerId, id, data) {
     Body: data,
   };
 
+  // Calculate the size of the uploaded data
+  const size = Buffer.byteLength(data, 'utf8');
+
   // Create a PUT Object command to send to S3
   const command = new PutObjectCommand(params);
+
+  // Create the UPDATE API params for DynamoDB
+  const dynamoDBParams = {
+    TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+    Key: {
+      ownerId: ownerId,
+      id: id,
+    },
+    UpdateExpression: 'set #size = :size',
+    ExpressionAttributeNames: {
+      '#size': 'size',
+    },
+    ExpressionAttributeValues: {
+      ':size': size,
+    },
+  };
+
+  // Create an UPDATE Item command to send to DynamoDB
+  const dynamoDBCommand = new UpdateCommand(dynamoDBParams);
 
   try {
     // Use our client to send the command
     await s3Client.send(command);
 
-    // Calculate the size of the uploaded data
-    const size = Buffer.byteLength(data, 'utf8');
-
-    // Create the UPDATE API params for DynamoDB
-    const dynamoDBParams = {
-      TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-      Key: {
-        ownerId: ownerId,
-        id: id,
-      },
-      UpdateExpression: 'set #size = :size',
-      ExpressionAttributeNames: {
-        '#size': 'size',
-      },
-      ExpressionAttributeValues: {
-        ':size': size,
-      },
-    };
-
-    // Create an UPDATE Item command to send to DynamoDB
-    const dynamoDBCommand = new UpdateCommand(dynamoDBParams);
     // Use our client to send the command to DynamoDB
     await ddbDocClient.send(dynamoDBCommand);
   } catch (err) {

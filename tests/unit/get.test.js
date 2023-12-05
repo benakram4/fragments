@@ -146,7 +146,7 @@ describe('GET /v1/fragments', () => {
       const hashEmail = hash(email);
       const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/plain' });
       await fragment1.save();
-      await fragment1.setData('test fragment by id/info');
+      await fragment1.setData(Buffer.from('test fragment by id/info'));
 
       // make the request
       const res = await request(app)

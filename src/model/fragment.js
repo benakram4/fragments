@@ -151,6 +151,9 @@ class Fragment {
       if (!data) {
         throw new Error(`data is required, got data=${data}`);
       }
+      if (!Buffer.isBuffer(data)) {
+        throw new Error(`data must be a Buffer, got data=${data}`);
+      }
       this.size = Buffer.byteLength(data, 'utf8');
       this.updated = new Date().toUTCString();
       await writeFragmentData(this.ownerId, this.id, data);
