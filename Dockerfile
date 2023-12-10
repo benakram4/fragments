@@ -4,8 +4,8 @@ FROM node:18.18.2@sha256:a6385a6bb2fdcb7c48fc871e35e32af8daaa82c518900be49b76d10
 LABEL maintainer="Ben Akram bakram4@myseneca.ca" \
   description="Fragments node.js microservice"
 
-ENV AUTH=cognito \
-AWS=true
+ENV AUTH=cognito
+ENV AWS=true
 
 ENV PORT=8080
 ENV NPM_CONFIG_LOGLEVEL=warn \
