@@ -11,12 +11,23 @@ services:
     build: .
     # Environment variables to use
     environment:
-      # Set the NODE_ENV to production to test with cognito
-      - NODE_ENV=production
       # Our API will be running on http://localhost:8080
       - API_URL=http://localhost:8080
+
+      ########## Data Model & Auth Configuration ##########
       # Use Basic Auth (for running tests, CI)
       - HTPASSWD_FILE=./tests/.htpasswd
+      # Auth selection, use basic auth or cognito auth
+      # AUTH=basic for basic auth | AUTH=cognito for cognito auth
+      - AUTH=basic
+      # inMemory = false | # AWS = true
+      - AWS=true
+      ######################################################
+
+      # AWS Amazon Cognito User Pool ID (use your User Pool ID)
+      - AWS_COGNITO_POOL_ID=us-east-1_2QUXYn3bc
+      # AWS Amazon Cognito Client App ID (use your Client App ID)
+      - AWS_COGNITO_CLIENT_ID=1k0u38a9g4qgpj8ba7kt2upbno
       # Use the LOG_LEVEL set in the host environment, or default to info
       - LOG_LEVEL=${LOG_LEVEL:-debug}
       - AWS_REGION=us-east-1

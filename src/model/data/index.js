@@ -3,7 +3,7 @@ const logger = require('../../logger');
 // If the environment sets an AWS Region, we'll use AWS backend
 // services (S3, DynamoDB); otherwise, we'll use an in-memory db.
 
-if(process.env.AWS_REGION) {
+if(process.env.AWS_REGION && process.env.AWS === 'true') {
   logger.info('Using AWS backend services');
   module.exports =  require('./aws')
 

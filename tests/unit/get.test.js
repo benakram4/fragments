@@ -197,7 +197,7 @@ describe('GET /v1/fragments', () => {
         .get(`/v1/fragments/${fragment1.id}.html`)
         .auth(email, 'password2');
 
-      logger.debug(`GET ext res: ${JSON.stringify(res, null, 2)}`);
+      logger.debug(`GET ext md-html res: ${JSON.stringify(res, null, 2)}`);
       // check the response status code
       expect(res.statusCode).toBe(200);
 
@@ -206,6 +206,56 @@ describe('GET /v1/fragments', () => {
       // check Content-Type header
       logger.debug(`res.headers.content-type: ${res.headers['content-type']}`);
       expect(res.headers['content-type']).toBe('text/html; charset=utf-8');
+    });
+
+    test("Gets an authenticated user's fragment data with the given id and extension, html to txt", async () => {
+      // create a fragment for the user
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'text/html' });
+      await fragment1.save();
+      await fragment1.setData(Buffer.from('<h1>test fragment by id.ext html to txt</h1>'));
+
+      // make the request for the text version of the fragment
+      const res = await request(app)
+        .get(`/v1/fragments/${fragment1.id}.txt`)
+        .auth(email, 'password2');
+
+      logger.debug(`GET ext html-txt res: ${JSON.stringify(res, null, 2)}`);
+
+      // check the response status code
+      expect(res.statusCode).toBe(200);
+
+      // check that the response contains the expected text
+      expect(res.text).toBe('TEST FRAGMENT BY ID.EXT HTML TO TXT');
+      // check Content-Type header
+      logger.debug(`res.headers.content-type: ${res.headers['content-type']}`);
+      expect(res.headers['content-type']).toBe('text/plain; charset=utf-8');
+    });
+
+    test("Gets an authenticated user's fragment data with the given id and extension, json to txt", async () => {
+      // create a fragment for the user
+      const email = 'user2@email.com';
+      const hashEmail = hash(email);
+      const fragment1 = new Fragment({ ownerId: hashEmail, type: 'application/json' });
+      await fragment1.save();
+      await fragment1.setData(Buffer.from('{"test": "fragment by id.ext json to txt"}'));
+
+      // make the request for the text version of the fragment
+      const res = await request(app)
+        .get(`/v1/fragments/${fragment1.id}.txt`)
+        .auth(email, 'password2');
+
+      logger.debug(`GET ext json-txt res: ${JSON.stringify(res, null, 2)}`);
+
+      // check the response status code
+      expect(res.statusCode).toBe(200);
+
+      // check that the response contains the expected text
+      expect(res.text).toBe('{"test": "fragment by id.ext json to txt"}');
+      // check Content-Type header
+      logger.debug(`res.headers.content-type: ${res.headers['content-type']}`);
+      expect(res.headers['content-type']).toBe('text/plain; charset=utf-8');
     });
   });
 });

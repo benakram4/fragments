@@ -6,7 +6,6 @@ const logger = require('../../logger');
 const { createErrorResponse, createSuccessResponse } = require('../../response');
 const sharp = require('sharp'); // for image processing
 
-
 module.exports = async (req, res, next) => {
   const API_URL = `http://${req.headers.host}`;
   try {
@@ -14,7 +13,7 @@ module.exports = async (req, res, next) => {
 
     // get the type from the request
     const { type } = contentType.parse(req);
-    logger.debug(`contentType.parse(req): ${type}`);
+    logger.debug(`POST contentType.parse(req): ${type}`);
     // check if the type is supported
     if (!Fragment.isSupportedType(type)) {
       logger.warn(`415 type is not supported`);
@@ -23,7 +22,7 @@ module.exports = async (req, res, next) => {
 
     // get the body from the request
     const data = req.body;
-    logger.debug(`req.body: ${data}`);
+    logger.debug(`POST req.body: ${data}`);
 
     if (Buffer.isBuffer(data)) {
       // create a new fragment
@@ -32,29 +31,25 @@ module.exports = async (req, res, next) => {
         type: type,
       });
       await fragment.save();
-      if(type.startsWith('image/')) {
+      if (type.startsWith('image/')) {
         // resize the image
-        const resizedImage = await sharp(data)
-          .resize(1000, 800)
-          .toBuffer();
-        logger.debug(`resizedImage: ${resizedImage}`);
+        const resizedImage = await sharp(data).resize(1000, 800).toBuffer();
+        logger.debug(`POST resizedImage: ${resizedImage}`);
         // set the data
         await fragment.setData(resizedImage);
-      }
-      else {
+      } else {
         // set the data
         await fragment.setData(data);
       }
       await fragment.save();
 
-
       logger.info(`fragment ownerId: ${fragment.ownerId}, saving fragment...`);
-      logger.debug(`fragment size: ${fragment.size}`);
+      logger.debug(`POSt fragment size: ${fragment.size}`);
       logger.debug(`fragment saved`);
 
       // send the response
       const location = `${API_URL}/v1/fragments/${fragment.id}`;
-      logger.debug(`location: ${location}`);
+      logger.debug(`POST location: ${location}`);
       res.location(location);
 
       res.status(201).json(

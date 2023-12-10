@@ -6,10 +6,9 @@ const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
 const MarkdownIt = require('markdown-it');
 const md = new MarkdownIt();
+const sharp = require('sharp'); // for image processing
+const { convert } = require('html-to-text');
 
-/**
- * Get a list of fragments for the current user
- */
 module.exports = async (req, res) => {
   try {
     // get user email from auth header
@@ -32,7 +31,9 @@ module.exports = async (req, res) => {
     // holders for single fragment
     let fragment = null; // fragment for get fragment by id
     let data = null; // data for get fragment by id
-    let isInfoReq = false; // check if the request is for info
+
+    // check if the request is for info
+    let isInfoReq = false;
     if (req.path.includes('info')) {
       isInfoReq = true;
     }
@@ -63,21 +64,33 @@ module.exports = async (req, res) => {
         fragment = await Fragment.byId(email, fragID);
         fragment.data = await fragment.getData();
 
-        if (fragment.type.startsWith('image/')) {
+        if (!ext && fragment.type.startsWith('image/')) {
           res.setHeader('Content-Type', fragment.type);
           res.status(200).send(fragment.data);
+        } else if (ext && fragment.type.startsWith('image/')) {
+          // convert the image to the requested format
+          const image = sharp(fragment.data);
+          const outputFormat = ext;
+          const outputBuffer = await image.toFormat(outputFormat).toBuffer();
+          res.setHeader('Content-Type', `image/${outputFormat}`);
+          res.status(200).send(outputBuffer);
         } else {
-          logger.debug(`GET/id fragment.data: ${fragment.data}`);
           data = Buffer.from(fragment.data).toString('utf-8');
-          logger.debug(`GET/id data: ${data}`);
           // If the extension is 'html' and the fragment's format is 'md', convert the data to HTML
           if (ext === 'html' && fragment.type === 'text/markdown') {
-            logger.debug(`Before GET/id.ext data: ${data}`);
             data = md.render(data);
-            logger.debug(`After GET/id.ext data: ${data}`);
+            res.setHeader('Content-Type', `text/html`);
+            res.status(200).send(data);
+          } else if (ext === 'txt' && fragment.type === 'text/html') {
+            data = convert(data);
+            res.setHeader('Content-Type', `text/plain`);
+            res.status(200).send(data);
+          } else if (ext === 'txt' && fragment.type === 'application/json') {
+            data = Buffer.from(fragment.data).toString('utf-8');
+            res.setHeader('Content-Type', `text/plain`);
             res.status(200).send(data);
           } else {
-            // set the content-type header
+            // set the content-type header //  this is for all other cases like text/plain and application/json
             res.setHeader('Content-Type', fragment.type);
             res.status(200).send(data);
           }

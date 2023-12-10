@@ -1,4 +1,4 @@
-// src/routes/api/get.js
+// src/routes/api/put.js
 
 const contentType = require('content-type');
 const { Fragment } = require('../../model/fragment');
@@ -8,23 +8,23 @@ const { createErrorResponse, createSuccessResponse } = require('../../response')
 module.exports = async (req, res) => {
   // get user email from auth header
   const email = req.user;
-  logger.debug(`get email: ${email}`); // email is the ownerID
+  logger.debug(`PUT get email: ${email}`);
 
   const fragID = req.params.id;
-  logger.debug(`fragId: ${fragID}`);
+  logger.debug(`PUT fragId: ${fragID}`);
 
   // get the type from the request
   const { type } = contentType.parse(req);
-  logger.debug(`contentType.parse(req): ${type}`);
+  logger.debug(`PUT contentType.parse(req): ${type}`);
 
   // get the body from the request
   const data = req.body;
-  logger.debug(`req.body: ${data}`);
+  logger.debug(`PUT req.body: ${data}`);
 
   try {
     // get a fragment with a given id
     const fragment = await Fragment.byId(email, fragID);
-    logger.debug(`PUT/ fragments: ${JSON.stringify(fragment, null, 2)}`);
+    logger.debug(`PUT fragments: ${JSON.stringify(fragment, null, 2)}`);
 
     if (fragment.type !== type) {
       logger.error(`Error in PUT /fragment: types are not the same, ${fragment.type} | ${type}`);
@@ -34,11 +34,11 @@ module.exports = async (req, res) => {
       await fragment.setData(data);
 
       // save the fragment to db
-      fragment.save();
-      logger.debug(`fragment saved`, JSON.stringify(fragment, null, 2));
+      await fragment.save();
+      logger.debug(`PUT fragment saved`, JSON.stringify(fragment, null, 2));
 
       // send the response
-      res.status(200).json(createSuccessResponse({fragment}));
+      res.status(200).json(createSuccessResponse({ fragment }));
     }
   } catch (err) {
     logger.error(`Error in PUT /fragments: ${err}`);

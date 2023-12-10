@@ -28,23 +28,23 @@ const rawBody = () =>
 // Define our second route, which will be: POST /v1/fragments
 // Use a raw body parser for POST, which will give a `Buffer` Object or `{}` at `req.body`
 // You can use Buffer.isBuffer(req.body) to test if it was parsed by the raw body parser.
+
+// POST (create)
 router.post('/fragments', rawBody(), require('./post'));
 
+// PUT (update)
 router.put('/fragments/:id', rawBody(), require('./put'));
 
+// GET (read)
 router.get('/fragments', require('./get'));
 
 router.get('/fragments/:id.:ext', require('./get'));
 
-// Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
 router.get('/fragments/:id', require('./get'));
 
 router.get('/fragments/:id/info', require('./get'));
 
-router.delete('/fragments/:id', require('./delete')); 
-
-
-
-// Other routes will go here later on...
+// DELETE (delete)
+router.delete('/fragments/:id', require('./delete'));
 
 module.exports = router;
